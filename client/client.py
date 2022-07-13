@@ -1,27 +1,29 @@
 #!/usr/bin/python3
 
 from xmlrpc import client
+from argparse import RawTextHelpFormatter
+import argparse
 import time
 import sys
-import argparse
-
-parser = argparse.ArgumentParser(description="Remote Tail logs")
 
 def get_args():
-    parser = argparse.ArgumentParser(description="Tail logs from remote server")
 
-    parser.add_argument("-host", "--hostname",
-                  dest="hostname",
-                  required=True,
-                  help="Host IP Address")
-    parser.add_argument("-f", "--filepath",
-                  dest="filepath",
-                  required=True,
-                  help="Path where the file is located, for example /var/log/syslog")
+    parser = argparse.ArgumentParser(description="Tail logs from remote server",
+                                    formatter_class=RawTextHelpFormatter)
     parser.add_argument("-p", "--port",
                   dest="port",
                   default="8000",
                   help="Agent Port number, defaults to 8000")
+
+    required = parser.add_argument_group("required arguments")
+    required.add_argument("-host", "--hostname",
+                  dest="hostname",
+                  required=True,
+                  help="Host IP Address")
+    required.add_argument("-f", "--filepath",
+                  dest="filepath",
+                  required=True,
+                  help="Path where the file is located.\nIt should be the full path from the root directory, or relative path \nfor example /var/log/syslog")
 
     return parser.parse_args()
 
@@ -54,9 +56,11 @@ def tail(filename, hostname, port):
 def main():
 
     args = get_args()
-
     try:
         tail(args.filepath, args.hostname, args.port)
+    except KeyboardInterrupt:
+        print("\nStopped")
+        sys.exit(0)
     except ConnectionError:
         print(f"[ERROR]: Connection refused, failed to connect to agent at {args.hostname}")
         sys.exit(111)
@@ -68,4 +72,5 @@ def main():
             print(err)
             sys.exit(1)
 
-main()
+if __name__ == "__main__":
+    main()

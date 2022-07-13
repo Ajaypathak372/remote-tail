@@ -3,6 +3,7 @@
 from xmlrpc.server import SimpleXMLRPCServer
 from xmlrpc.server import SimpleXMLRPCRequestHandler
 import argparse
+import sys
 import os
 
 def get_args():
@@ -35,10 +36,9 @@ def tail(filename, seek):
     f.seek(seek)
     return f.read()
 
-def CreateServer():
-    args = get_args()
+def CreateServer(hostname, port):
     # Create server
-    server = SimpleXMLRPCServer((args.hostname, args.port),
+    server = SimpleXMLRPCServer((hostname, port),
                                requestHandler=RequestHandler)
 
     # register functions
@@ -46,7 +46,17 @@ def CreateServer():
     server.register_function(GetSize, 'GetSize')
 
     # Run the server's main loop
+    print(f"Running at {hostname} on port {port}")
     server.serve_forever()
 
 # start server
-CreateServer()
+def main():
+    args = get_args()
+    try:
+        CreateServer(args.hostname, args.port)
+    except KeyboardInterrupt:
+        print("\nStopped")
+        sys.exit(0)
+
+if __name__ == "__main__":
+    main()
