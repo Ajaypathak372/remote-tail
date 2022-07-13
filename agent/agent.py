@@ -24,26 +24,26 @@ def get_args():
 class RequestHandler(SimpleXMLRPCRequestHandler):
     rpc_paths = ('/RPC2')
 
-def GetSize(filename):
+def get_size(filename):
     # get file size
     return os.stat(filename)[6]
 
 def tail(filename, seek):
     #Set the filename and open the file
-    f = open(filename,'r')
+    with open(filename,'r', encoding="utf-8") as file:
+        #Find the size of the file and move to the end
+        file.seek(seek)
 
-    #Find the size of the file and move to the end
-    f.seek(seek)
-    return f.read()
+    return file.read()
 
-def CreateServer(hostname, port):
+def create_server(hostname, port):
     # Create server
     server = SimpleXMLRPCServer((hostname, port),
                                requestHandler=RequestHandler)
 
     # register functions
     server.register_function(tail, 'tail')
-    server.register_function(GetSize, 'GetSize')
+    server.register_function(get_size, 'get_size')
 
     # Run the server's main loop
     print(f"Running at {hostname} on port {port}")
@@ -53,7 +53,7 @@ def CreateServer(hostname, port):
 def main():
     args = get_args()
     try:
-        CreateServer(args.hostname, args.port)
+        create_server(args.hostname, args.port)
     except KeyboardInterrupt:
         print("\nStopped")
         sys.exit(0)
