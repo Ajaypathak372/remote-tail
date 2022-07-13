@@ -46,4 +46,3 @@ jobs:
         docker build -t $DOCKERHUB_REPO/$IMAGE_NAME:${GITHUB_REF##*/}-$git_hash .
         echo "Pushing image to DockerHub..."
         docker push $DOCKERHUB_REPO/$IMAGE_NAME:${GITHUB_REF##*/}-$git_hash
-        echo "::set-output name=image::$DOCKERHUB_REPO/$IMAGE_NAME:${GITHUB_REF##*/}-$git_hash"
