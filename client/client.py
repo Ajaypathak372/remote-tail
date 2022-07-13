@@ -37,25 +37,22 @@ def tail(filename, hostname, port):
     proxy = client.ServerProxy(location)
 
     # get starting length of file
-    cur_seek = proxy.GetSize(filename)
+    cur_seek = proxy.get_size(filename)
+
+    # store current file length
+    prev_seek = cur_seek
 
     # constantly check
     while True:
         time.sleep(1) # make sure to sleep
 
         # get a new length of file and check for changes
-        prev_seek = cur_seek
-
-        # some times it fails if the file is being writter to,
-        # we'll wait another second for it to finish
-        try:
-            cur_seek = proxy.GetSize(filename)
-        except: # pylint: disable=bare-except
-            pass
+        cur_seek = proxy.get_size(filename)
 
         # if file length has changed print it
         if prev_seek != cur_seek:
             print(proxy.tail(filename, prev_seek))
+            prev_seek = cur_seek
 
 def main():
 
@@ -64,7 +61,6 @@ def main():
         tail(args.filepath, args.hostname, args.port)
     except KeyboardInterrupt:
         print("\nStopped")
-        sys.exit(0)
     except ConnectionError:
         print(f"[ERROR]: Connection refused, failed to connect to agent at {args.hostname}")
         sys.exit(111)

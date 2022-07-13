@@ -3,7 +3,6 @@
 from xmlrpc.server import SimpleXMLRPCServer
 from xmlrpc.server import SimpleXMLRPCRequestHandler
 import argparse
-import sys
 import os
 
 def get_args():
@@ -33,8 +32,7 @@ def tail(filename, seek):
     with open(filename,'r', encoding="utf-8") as file:
         #Find the size of the file and move to the end
         file.seek(seek)
-
-    return file.read()
+        return file.read()
 
 def create_server(hostname, port):
     # Create server
@@ -56,7 +54,6 @@ def main():
         create_server(args.hostname, args.port)
     except KeyboardInterrupt:
         print("\nStopped")
-        sys.exit(0)
 
 if __name__ == "__main__":
     main()
